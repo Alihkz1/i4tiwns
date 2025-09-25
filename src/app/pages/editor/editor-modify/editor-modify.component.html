@@ -1,33 +1,24 @@
 <div class="svg-editor-container">
-    <!-- Controls -->
-    <!-- <div class="controls">
-        <div class="control-group">
-
-            <button (click)="downloadSVG()" class="control-btn" [disabled]="!svgContent()">
-                💾 Export SVG
-            </button>
-
-        </div>
-    </div> -->
 
     <!-- Context Menu -->
     @if (showContextMenu()) {
     <div class="context-menu" [style.left.px]="contextMenuPosition().x" [style.top.px]="contextMenuPosition().y">
         <button (click)="addTextLabel()" class="menu-item">
-            📝 Add Text Label
+            📝 Add Label
         </button>
         <button (click)="hideContextMenu()" class="menu-item">
-            Cancel
+            ❌ Close Menu
         </button>
     </div>
     }
 
     <!-- SVG Container -->
-    <div #svgContainer class="svg-container" [class.has-svg]="!!svgContent()" (click)="updateContainerRect()">
+    <div #svgContainer class="svg-container" (click)="updateContainerRect()">
 
         <svg #svgCanvas [attr.width]="svgDimensions().width" [attr.height]="svgDimensions().height"
             [attr.viewBox]="'0 0 ' + svgDimensions().width + ' ' + svgDimensions().height" class="svg-canvas"
             (contextmenu)="onRightClick($event)" (click)="onSvgClick($event)">
+
             <!-- Loaded SVG Content -->
             @if (svgContent()) {
             <g class="loaded-svg-content" [innerHTML]="svgContent()"></g>

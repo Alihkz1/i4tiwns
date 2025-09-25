@@ -1,6 +1,12 @@
 <div class="flex items-center gap-4 w-full h-10 px-8 border-b bg-gray-100">
-    <nz-icon class="icon" nzType="cloud-upload" nzTheme="outline" (click)="onUpload()" />
+    <div class="flex items-center gap-2 cursor-pointer" (click)="onSave()">
+        <nz-icon nzType="save" nzTheme="outline" />
+        <span class="text-xs">Save</span>
+    </div>
     <div class="w-[1px] h-8 bg-gray-300"></div>
-    <nz-icon class="icon" nzType="save" nzTheme="outline" (click)="onSave()" />
+    <div class="flex items-center gap-2 cursor-pointer" (click)="onUpload()">
+        <nz-icon nzType="cloud-upload" nzTheme="outline" />
+        <span class="text-xs">Upload</span>
+    </div>
     <input type="file" class="hidden" id="upload" accept="image/svg+xml" (change)="onFileSelected($event)">
 </div>

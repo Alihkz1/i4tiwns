@@ -1,6 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { SVGItem } from '../shared/interfaces/svg.interface';
-import { Subscription } from 'rxjs';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { EncodedSvg } from '../shared/utilities/svg-to-image.utility';
 import { EditorFacade } from '../shared/facade/editor.facade';
@@ -16,15 +15,17 @@ export class EditorListComponent implements OnInit {
   editorApi = inject(EditorApiService)
   editorFacade = inject(EditorFacade)
   svgs: SVGItem[] = []
-  pending: Subscription | undefined
 
   ngOnInit(): void {
     this.getData()
+    window.addEventListener("newUpload", () => {
+      this.getData()
+    })
   }
 
   getData() {
     // this.editorApi.deleteSvg("58a9").subscribe()
-    this.pending = this.editorApi.getSvgs().subscribe((svgs: SVGItem[]) => {
+    this.editorApi.getSvgs().subscribe((svgs: SVGItem[]) => {
       this.svgs = svgs.map((svg) => ({
         ...svg,
         img: EncodedSvg(svg.content)

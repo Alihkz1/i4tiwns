@@ -53,52 +53,13 @@ export class EditorModifyComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.editorFacade.saveSvgTrigger().subscribe(() => {
-      this.downloadSVG()
+      this.onSave()
     })
     this.updateContainerRect();
     this.editorFacade.selectedSvgAsObs().subscribe((svg) => {
       if (!svg) return;
-      this.loadSVGFromFile(svg.text)
+      this.loadSVGFromFile(svg.content)
     })
-  }
-
-  public downloadSVG(): void {
-    const svgString = this.exportSVGWithLabels();
-
-    // const blob = new Blob([svgString], { type: 'image/svg+xml' });
-    // const url = URL.createObjectURL(blob);
-    // const a = document.createElement('a');
-    // a.href = url;
-    // a.download = 'labeled-diagram.svg';
-    // a.click();
-    // URL.revokeObjectURL(url);
-
-    const updatedItem = {
-      ...this.editorFacade.getSelectedSvg!,
-      content: svgString,
-      text: svgString
-    };
-
-    this.editorApi.updateSvg(updatedItem).subscribe((res) => {
-      if (!res) return;
-      this.notification
-        .success(
-          'SVG Saved!',
-          ''
-        )
-    });
-  }
-
-  public updateContainerRect(): void {
-    const container = this.svgContainer()?.nativeElement;
-    if (!container) return
-    const rect = container.getBoundingClientRect();
-    this.containerRect.set({
-      left: rect.left,
-      top: rect.top,
-      width: rect.width,
-      height: rect.height
-    });
   }
 
   async loadSVGFromFile(svgFile: string): Promise<void> {
@@ -124,6 +85,60 @@ export class EditorModifyComponent implements AfterViewInit {
     } finally {
       this.isLoading.set(false);
     }
+  }
+
+  private onSave(): void {
+    const svgString = this.exportSVGWithLabels();
+
+    const updatedItem = {
+      ...this.editorFacade.getSelectedSvg!,
+      content: svgString,
+    };
+
+    this.editorApi.updateSvg(updatedItem).subscribe((res) => {
+      if (!res) return;
+      this.notification
+        .success(
+          'SVG Saved!',
+          ''
+        )
+    });
+  }
+
+  exportSVGWithLabels(): string {
+    const svgElement = this.svgCanvas()?.nativeElement;
+    if (!svgElement) return '';
+
+    const clone = svgElement.cloneNode(true) as SVGSVGElement;
+
+    const foreignObjects = clone.querySelectorAll('foreignObject');
+
+    foreignObjects.forEach(fo => fo.remove());
+
+    this.textLabels().forEach(label => {
+      if (!label.isEditing) {
+        const textElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        textElement.setAttribute('x', label.x.toString());
+        textElement.setAttribute('y', label.y.toString());
+        // textElement.setAttribute('class', 'exported-label');
+        // textElement.textContent = label.text;
+        clone.appendChild(textElement);
+      }
+    });
+
+    return new XMLSerializer().serializeToString(clone);
+  }
+
+  public updateContainerRect(): void {
+    const container = this.svgContainer()?.nativeElement;
+    if (!container) return
+    const rect = container.getBoundingClientRect();
+    this.containerRect.set({
+      left: rect.left,
+      top: rect.top,
+      width: rect.width,
+      height: rect.height
+    });
   }
 
   private extractSVGDimensions(svgText: string): void {
@@ -204,24 +219,7 @@ export class EditorModifyComponent implements AfterViewInit {
     }
   }
 
-  private currentClickPosition = { x: 0, y: 0 };
-
-  addTextLabel(): void {
-    const newLabel: TextLabel = {
-      id: `label-${this._nextLabelId++}`,
-      x: this.currentClickPosition.x,
-      y: this.currentClickPosition.y,
-      text: 'New Label',
-      isEditing: true
-    };
-
-    this.textLabels.update(labels => [...labels, newLabel]);
-    this.hideContextMenu();
-
-    setTimeout(() => {
-      this.focusTextInput(newLabel.id);
-    }, 10);
-  }
+  // editing
 
   startEditing(labelId: string): void {
     this.textLabels.update(labels =>
@@ -258,36 +256,40 @@ export class EditorModifyComponent implements AfterViewInit {
     );
   }
 
+  // label
+
   removeLabel(labelId: string): void {
     this.textLabels.update(labels => labels.filter(label => label.id !== labelId));
   }
 
-  hideContextMenu(): void {
-    this.showContextMenu.set(false);
+  private currentClickPosition = { x: 0, y: 0 };
+
+  addTextLabel(): void {
+    const newLabel: TextLabel = {
+      id: `label-${this._nextLabelId++}`,
+      x: this.currentClickPosition.x,
+      y: this.currentClickPosition.y,
+      text: 'New Label',
+      isEditing: true
+    };
+
+    this.textLabels.update(labels => [...labels, newLabel]);
+    this.hideContextMenu();
+
+    setTimeout(() => {
+      this.focusTextInput(newLabel.id);
+    }, 10);
   }
 
-  exportSVGWithLabels(): string {
-    const svgElement = this.svgCanvas()?.nativeElement;
-    if (!svgElement) return '';
 
-    const clone = svgElement.cloneNode(true) as SVGSVGElement;
+  //context menu
 
-    const foreignObjects = clone.querySelectorAll('foreignObject');
+  private isContextMenuEvent(event: MouseEvent): boolean {
+    return (event.target as HTMLElement).closest('.context-menu') !== null;
+  }
 
-    foreignObjects.forEach(fo => fo.remove());
-
-    this.textLabels().forEach(label => {
-      if (!label.isEditing) {
-        const textElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        textElement.setAttribute('x', label.x.toString());
-        textElement.setAttribute('y', label.y.toString());
-        // textElement.setAttribute('class', 'exported-label');
-        // textElement.textContent = label.text;
-        clone.appendChild(textElement);
-      }
-    });
-
-    return new XMLSerializer().serializeToString(clone);
+  hideContextMenu(): void {
+    this.showContextMenu.set(false);
   }
 
   private focusTextInput(labelId: string): void {
@@ -296,9 +298,5 @@ export class EditorModifyComponent implements AfterViewInit {
       inputElement.focus();
       inputElement.select();
     }
-  }
-
-  private isContextMenuEvent(event: MouseEvent): boolean {
-    return (event.target as HTMLElement).closest('.context-menu') !== null;
   }
 }

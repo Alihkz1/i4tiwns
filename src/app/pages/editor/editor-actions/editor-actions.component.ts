@@ -25,12 +25,12 @@ export class EditorActionsComponent {
     },
     {
       active: false,
-      disabled: false,
+      disabled: true,
       name: 'View'
     },
     {
       active: false,
-      disabled: false,
+      disabled: true,
       name: 'Animation'
     }
   ];

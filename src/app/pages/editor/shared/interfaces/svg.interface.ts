@@ -3,5 +3,4 @@ export interface SVGItem {
     name: string;
     content: string;
     img?: string;
-    text: string;
 }

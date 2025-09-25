@@ -1,7 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { EditorApiService } from '../shared/api/editor-api.service';
-import { FileTypes } from '../shared/enums/file-types.enum';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { EditorFacade } from '../shared/facade/editor.facade';
 
@@ -12,37 +11,32 @@ import { EditorFacade } from '../shared/facade/editor.facade';
   styleUrl: './editor-header.component.scss'
 })
 export class EditorHeaderComponent {
-  editorApi = inject(EditorApiService)
   editorFacade = inject(EditorFacade)
+  editorApi = inject(EditorApiService)
   notification = inject(NzNotificationService)
 
-  onUpload() {
+  public onUpload() {
     const uploadInput = document.getElementById('upload')
     uploadInput?.click()
   }
 
-  onSave() {
+  public onSave() {
     this.editorFacade.trigSave()
   }
 
-  onFileSelected(event: Event) {
+  public onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files?.length) {
-      const file = input.files[0];
-      if (file.type != FileTypes.SVG) {
-        this.fileTypeWarnNotification()
-        return
-      }
-      this.editorApi.uploadSvg(file).subscribe();
+      const svgFile = input.files[0];
+      this.editorApi.uploadSvg(svgFile).subscribe((res) => {
+        if (!res) return
+        this.notification
+          .success(
+            'Successful Upload!',
+            ''
+          )
+        window.dispatchEvent(new Event('newUpload'))
+      });
     }
   }
-
-  fileTypeWarnNotification(): void {
-    this.notification
-      .warning(
-        'Wrong SVG',
-        'You are allowed to upload SVG files!'
-      )
-  }
-
 }
