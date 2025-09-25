@@ -1,15 +1,13 @@
 <div class="w-full h-dvh flex flex-col">
-  <div class="w-full bg-pink-200">
-    <app-editor-header></app-editor-header>
-  </div>
+  <app-editor-header></app-editor-header>
   <div class="grid grid-cols-9 grow">
-    <div class="col-span-2 bg-yellow-200">
-      <app-editor-list></app-editor-list>
-    </div>
-    <div class="col-span-5 bg-red-200">
+    <div class="p-4 col-span-9 md:order-2 md:col-span-5 border-b md:border-r">
       <app-editor-modify></app-editor-modify>
     </div>
-    <div class="col-span-2 bg-blue-200">
+    <div class="p-4 col-span-4 md:order-1 md:col-span-2 border-r">
+      <app-editor-list></app-editor-list>
+    </div>
+    <div class="p-4 col-span-5 md:col-span-2 md:order-3">
       <app-editor-actions></app-editor-actions>
     </div>
   </div>

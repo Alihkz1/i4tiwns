@@ -1,1 +1,12 @@
-<p>editor-list works!</p>
+<div class="grid gap-4 md:grid-cols-2">
+    @if (pending && !pending.closed) {
+    <nz-spin nzSimple></nz-spin>
+    }@else {
+    @for (svg of svgs; track svg.id) {
+    <div class="svg">
+        <span class="absolute top-0 text-gray-500"> {{svg.name}}</span>
+        <img class="h-20 w-20 opacity-40" [src]="svg.img" alt="">
+    </div>
+    }
+    }
+</div>
