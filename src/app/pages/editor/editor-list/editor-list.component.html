@@ -3,9 +3,9 @@
     <nz-spin nzSimple></nz-spin>
     }@else {
     @for (svg of svgs; track svg.id) {
-    <div class="svg">
-        <span class="absolute top-0 text-gray-500"> {{svg.name}}</span>
-        <img class="h-20 w-20 opacity-40" [src]="svg.img" alt="">
+    <div class="svg" [class.active-svg]="svg.id === editorFacade.getSelectedSvg?.id" (click)="svg_onClick(svg)">
+        <span class="absolute top-0 text-gray-500 select-none"> {{svg.name}}</span>
+        <img class="h-20 w-20 opacity-40 select-none" [src]="svg.img" alt="">
     </div>
     }
     }

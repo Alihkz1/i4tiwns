@@ -1,1 +1,71 @@
-<p>editor-modify works!</p>
+<div class="svg-editor-container">
+    <!-- Controls -->
+    <!-- <div class="controls">
+        <div class="control-group">
+
+            <button (click)="downloadSVG()" class="control-btn" [disabled]="!svgContent()">
+                💾 Export SVG
+            </button>
+
+        </div>
+    </div> -->
+
+    <!-- Context Menu -->
+    @if (showContextMenu()) {
+    <div class="context-menu" [style.left.px]="contextMenuPosition().x" [style.top.px]="contextMenuPosition().y">
+        <button (click)="addTextLabel()" class="menu-item">
+            📝 Add Text Label
+        </button>
+        <button (click)="hideContextMenu()" class="menu-item">
+            Cancel
+        </button>
+    </div>
+    }
+
+    <!-- SVG Container -->
+    <div #svgContainer class="svg-container" [class.has-svg]="!!svgContent()" (click)="updateContainerRect()">
+
+        <svg #svgCanvas [attr.width]="svgDimensions().width" [attr.height]="svgDimensions().height"
+            [attr.viewBox]="'0 0 ' + svgDimensions().width + ' ' + svgDimensions().height" class="svg-canvas"
+            (contextmenu)="onRightClick($event)" (click)="onSvgClick($event)">
+            <!-- Loaded SVG Content -->
+            @if (svgContent()) {
+            <g class="loaded-svg-content" [innerHTML]="svgContent()"></g>
+            }
+
+            <!-- Text Labels Layer -->
+            @for (label of textLabels(); track label.id) {
+            @if (label.isEditing) {
+            <foreignObject [attr.x]="label.x" [attr.y]="label.y" width="200" height="40">
+                <div xmlns="http://www.w3.org/1999/xhtml" class="text-input-container">
+                    <input [attr.data-label-id]="label.id" type="text" [value]="label.text"
+                        (keydown.enter)="finishEditing(label.id, $event)" (keydown.escape)="cancelEditing(label.id)"
+                        (blur)="finishEditing(label.id, $event)" class="text-input" placeholder="Enter text..." />
+                </div>
+            </foreignObject>
+            } @else {
+            <text [attr.x]="label.x" [attr.y]="label.y" class="text-label" (dblclick)="startEditing(label.id)">
+                {{ label.text }}
+                <title>Double-click to edit</title>
+            </text>
+            }
+            }
+        </svg>
+    </div>
+
+    @if (textLabels().length > 0) {
+    <h4 class="bg-yellow-200 ms-1 w-fit px-1 rounded">Labels Count: {{ textLabels().length }}</h4>
+    <div class="flex flex-col w-full">
+        @for (label of textLabels(); track label.id) {
+        <div class="flex justify-between w-full px-2 border-t py-3 hover:bg-gray-100">
+            <span class="label-coords">({{ label.x }}, {{ label.y }})</span>
+            <span class="label-text">{{ label.text }}</span>
+            <div class="flex items-center gap-3">
+                <button (click)="startEditing(label.id)" class="icon-btn" title="Edit">✏️</button>
+                <button (click)="removeLabel(label.id)" class="icon-btn" title="Remove">🗑️</button>
+            </div>
+        </div>
+        }
+    </div>
+    }
+</div>

@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
+import { EditorFacade } from '../shared/facade/editor.facade';
 
 @Component({
   selector: 'app-editor-actions',
@@ -8,21 +9,29 @@ import { NzCollapseModule } from 'ng-zorro-antd/collapse';
   styleUrl: './editor-actions.component.scss'
 })
 export class EditorActionsComponent {
+
+  editorFacade = inject(EditorFacade)
+
   panels = [
     {
-      active: true,
-      name: 'This is panel header 1',
-      disabled: false
+      active: false,
+      disabled: false,
+      name: 'Action',
     },
     {
       active: false,
       disabled: false,
-      name: 'This is panel header 2'
+      name: 'Content'
     },
     {
       active: false,
-      disabled: true,
-      name: 'This is panel header 3'
+      disabled: false,
+      name: 'View'
+    },
+    {
+      active: false,
+      disabled: false,
+      name: 'Animation'
     }
   ];
 }

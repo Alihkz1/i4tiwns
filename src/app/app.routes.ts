@@ -7,6 +7,11 @@ export const appRoutes: Routes = [
         component: LayoutComponent,
         children: [
             {
+                path: '',
+                pathMatch: 'full',
+                redirectTo: 'editor'
+            },
+            {
                 path: "editor",
                 loadChildren: () =>
                     import("./pages/editor/editor.routing").then(

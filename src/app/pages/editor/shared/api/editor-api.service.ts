@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { SVGItem } from '../interfaces/svg.interface';
@@ -6,19 +6,20 @@ import { SVGItem } from '../interfaces/svg.interface';
 @Injectable({
     providedIn: 'root'
 })
-export class SvgApiService {
+export class EditorApiService {
+    private http = inject(HttpClient);
     private apiUrl = 'http://localhost:3000/svg';
-
-    constructor(private http: HttpClient) { }
 
     uploadSvg(file: File): Observable<SVGItem> {
         return new Observable(observer => {
             const reader = new FileReader();
-            reader.onload = () => {
+            reader.onload = async () => {
+                const text = await file.text()
                 const svgContent = reader.result as string;
                 const svgItem: SVGItem = {
                     name: file.name,
-                    content: svgContent
+                    content: svgContent,
+                    text
                 };
                 this.http.post<SVGItem>(this.apiUrl, svgItem).subscribe({
                     next: res => observer.next(res),

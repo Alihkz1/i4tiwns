@@ -1,8 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { SvgApiService } from '../shared/api/editor-api.service';
+import { EditorApiService } from '../shared/api/editor-api.service';
 import { FileTypes } from '../shared/enums/file-types.enum';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { EditorFacade } from '../shared/facade/editor.facade';
 
 @Component({
   selector: 'app-editor-header',
@@ -11,7 +12,8 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
   styleUrl: './editor-header.component.scss'
 })
 export class EditorHeaderComponent {
-  svgApi = inject(SvgApiService)
+  editorApi = inject(EditorApiService)
+  editorFacade = inject(EditorFacade)
   notification = inject(NzNotificationService)
 
   onUpload() {
@@ -19,7 +21,9 @@ export class EditorHeaderComponent {
     uploadInput?.click()
   }
 
-  onSave() { }
+  onSave() {
+    this.editorFacade.trigSave()
+  }
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -29,7 +33,7 @@ export class EditorHeaderComponent {
         this.fileTypeWarnNotification()
         return
       }
-      this.svgApi.uploadSvg(file).subscribe();
+      this.editorApi.uploadSvg(file).subscribe();
     }
   }
 

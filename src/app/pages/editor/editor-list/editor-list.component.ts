@@ -1,9 +1,10 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { SvgApiService } from '../shared/api/editor-api.service';
 import { SVGItem } from '../shared/interfaces/svg.interface';
 import { Subscription } from 'rxjs';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { EncodedSvg } from '../shared/utilities/svg-to-image.utility';
+import { EditorFacade } from '../shared/facade/editor.facade';
+import { EditorApiService } from '../shared/api/editor-api.service';
 
 @Component({
   selector: 'app-editor-list',
@@ -12,7 +13,8 @@ import { EncodedSvg } from '../shared/utilities/svg-to-image.utility';
   styleUrl: './editor-list.component.scss'
 })
 export class EditorListComponent implements OnInit {
-  svgApi = inject(SvgApiService)
+  editorApi = inject(EditorApiService)
+  editorFacade = inject(EditorFacade)
   svgs: SVGItem[] = []
   pending: Subscription | undefined
 
@@ -21,12 +23,17 @@ export class EditorListComponent implements OnInit {
   }
 
   getData() {
-    this.pending = this.svgApi.getSvgs().subscribe((svgs: SVGItem[]) => {
+    // this.editorApi.deleteSvg("58a9").subscribe()
+    this.pending = this.editorApi.getSvgs().subscribe((svgs: SVGItem[]) => {
       this.svgs = svgs.map((svg) => ({
         ...svg,
         img: EncodedSvg(svg.content)
       }))
-      console.log(svgs)
+      console.log(svgs);
     })
+  }
+
+  svg_onClick(svg: SVGItem) {
+    this.editorFacade.setSelectedSvg = svg
   }
 }
