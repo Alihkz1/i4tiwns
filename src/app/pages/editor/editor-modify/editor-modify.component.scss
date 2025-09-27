@@ -4,6 +4,7 @@
   background: white;
   max-width: 1200px;
   margin: 0 auto;
+  user-select: none; // prevent accidental text selection while dragging
 }
 
 .file-input-label {
@@ -14,7 +15,7 @@
   color: white;
   border-radius: 4px;
   transition: all 0.3s;
-  
+
   &:hover {
     background: #0056b3;
   }
@@ -35,17 +36,16 @@
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s;
-  
+
   &:hover:not(:disabled) {
     background: #1e7e34;
   }
-  
+
   &:disabled {
     background: #6c757d;
     cursor: not-allowed;
   }
 }
-
 
 .svg-container {
   position: relative;
@@ -59,19 +59,20 @@
   cursor: crosshair;
   background: #fafafa;
   max-width: 100%;
-  padding: 2rem;  
+  padding: 2rem;
   max-height: 70vh;
+
   .loaded-svg-content {
     pointer-events: none;
   }
 }
 
 .context-menu {
-  position: fixed; 
+  position: absolute; // fixed → absolute (relative to container)
   background: white;
   border: 1px solid #ccc;
   border-radius: 4px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   min-width: 150px;
 }
@@ -84,6 +85,7 @@
   text-align: left;
   cursor: pointer;
   border-bottom: 1px solid #eee;
+  font-size: 14px;
 
   &:hover {
     background: #f0f0f0;
@@ -98,7 +100,7 @@
   font-family: Arial, sans-serif;
   font-size: 14px;
   fill: #007bff;
-  cursor: pointer;
+  cursor: move; // indicates drag
   user-select: none;
   font-weight: bold;
   paint-order: stroke;
@@ -106,6 +108,7 @@
   stroke-width: 3;
   stroke-linecap: round;
   stroke-linejoin: round;
+  transition: fill 0.2s;
 
   &:hover {
     fill: #0056b3;
@@ -120,5 +123,5 @@
   font-size: 14px;
   outline: none;
   background: white;
-  box-shadow: 0 2px 5px rgba(0,123,255,0.3);
+  box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3);
 }
