@@ -80,8 +80,6 @@ export class EditorModifyComponent implements AfterViewInit {
       this.textLabels.set([]);
       this.extractSVGDimensions(svgFile);
       this.updateContainerRect();
-    } catch (error) {
-      console.error('Error loading SVG:', error);
     } finally {
       this.isLoading.set(false);
     }
@@ -120,8 +118,6 @@ export class EditorModifyComponent implements AfterViewInit {
         const textElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         textElement.setAttribute('x', label.x.toString());
         textElement.setAttribute('y', label.y.toString());
-        // textElement.setAttribute('class', 'exported-label');
-        // textElement.textContent = label.text;
         clone.appendChild(textElement);
       }
     });
