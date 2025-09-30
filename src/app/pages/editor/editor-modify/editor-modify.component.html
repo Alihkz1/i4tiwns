@@ -12,6 +12,23 @@
     </div>
     }
 
+    @if(svgContent()){
+    <div class="w-full">
+        <button nz-button nzType="primary" (click)="openEditDialog()">
+            ✏️ Edit Elements
+        </button>
+    </div>
+    }
+
+    <nz-modal [(nzVisible)]="isEditDialogVisible" nzTitle="Edit SVG Elements" (nzOnCancel)="handleCancelEdit()"
+        (nzOnOk)="onSave()" [nzWidth]="800">
+        <ng-container *nzModalContent>
+            <textarea [(ngModel)]="editSvgContent" class="w-full h-96 border p-2 font-mono text-sm"
+                placeholder="Edit SVG elements here..."></textarea>
+        </ng-container>
+    </nz-modal>
+
+
     <!-- SVG Container -->
     <div #svgContainer class="svg-container" (click)="updateContainerRect()">
 

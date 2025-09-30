@@ -1,8 +1,11 @@
 import { Component, HostListener, signal, ElementRef, viewChild, AfterViewInit, inject } from '@angular/core';
-import { EditorFacade } from '../shared/facade/editor.facade';
+import { EditorFacade, SVG_ACTION } from '../shared/facade/editor.facade';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { EditorApiService } from '../shared/api/editor-api.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { FormsModule } from '@angular/forms';
+import { NzButtonModule } from 'ng-zorro-antd/button';
 
 interface TextLabel {
   id: string;
@@ -14,6 +17,7 @@ interface TextLabel {
 
 @Component({
   selector: 'app-editor-modify',
+  imports: [NzModalModule, FormsModule, NzButtonModule],
   templateUrl: './editor-modify.component.html',
   styleUrls: ['./editor-modify.component.scss']
 })
@@ -34,6 +38,10 @@ export class EditorModifyComponent implements AfterViewInit {
   private editorFacade = inject(EditorFacade)
   notification = inject(NzNotificationService)
 
+  isEditDialogVisible = false;
+  editSvgContent = '';
+
+
   @HostListener('window:resize')
   onWindowResize(): void {
     this.updateContainerRect();
@@ -52,8 +60,8 @@ export class EditorModifyComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.editorFacade.saveSvgTrigger().subscribe(() => {
-      this.onSave()
+    this.editorFacade.svgActionTrigger().subscribe((res: any) => {
+      if (res && res.type && res.type === SVG_ACTION.SAVE && this.svgContent()) this.onSave()
     })
     this.updateContainerRect();
     this.editorFacade.selectedSvgAsObs().subscribe((svg) => {
@@ -85,7 +93,7 @@ export class EditorModifyComponent implements AfterViewInit {
     }
   }
 
-  private onSave(): void {
+  public onSave(): void {
     const svgString = this.exportSVGWithLabels();
 
     const updatedItem = {
@@ -95,6 +103,7 @@ export class EditorModifyComponent implements AfterViewInit {
 
     this.editorApi.updateSvg(updatedItem).subscribe((res) => {
       if (!res) return;
+      if (this.isEditDialogVisible) this.isEditDialogVisible = false;
       this.notification
         .success(
           'SVG Saved!',
@@ -294,5 +303,19 @@ export class EditorModifyComponent implements AfterViewInit {
       inputElement.focus();
       inputElement.select();
     }
+  }
+
+
+  // edit elements in dialog 
+
+  openEditDialog(): void {
+    const svg = this.svgCanvas()?.nativeElement;
+    if (!svg) return;
+    this.editSvgContent = svg.innerHTML;
+    this.isEditDialogVisible = true;
+  }
+
+  handleCancelEdit(): void {
+    this.isEditDialogVisible = false;
   }
 }

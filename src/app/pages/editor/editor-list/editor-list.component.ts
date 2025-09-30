@@ -1,8 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal, Signal, WritableSignal } from '@angular/core';
 import { SVGItem } from '../shared/interfaces/svg.interface';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { EncodedSvg } from '../shared/utilities/svg-to-image.utility';
-import { EditorFacade } from '../shared/facade/editor.facade';
+import { EditorFacade, SVG_ACTION } from '../shared/facade/editor.facade';
 import { EditorApiService } from '../shared/api/editor-api.service';
 
 @Component({
@@ -14,23 +14,20 @@ import { EditorApiService } from '../shared/api/editor-api.service';
 export class EditorListComponent implements OnInit {
   editorApi = inject(EditorApiService)
   editorFacade = inject(EditorFacade)
-  svgs: SVGItem[] = []
+  svgs: WritableSignal<SVGItem[]> = signal([])
 
   ngOnInit(): void {
-    this.getData()
-    window.addEventListener("newUpload", () => {
+    this.editorFacade.svgActionTrigger().subscribe(() => {
       this.getData()
     })
   }
 
   getData() {
-    // this.editorApi.deleteSvg("58a9").subscribe()
     this.editorApi.getSvgs().subscribe((svgs: SVGItem[]) => {
-      this.svgs = svgs.map((svg) => ({
+      this.svgs.set(svgs.map((svg) => ({
         ...svg,
         img: EncodedSvg(svg.content)
-      }))
-      console.log(svgs);
+      })))
     })
   }
 

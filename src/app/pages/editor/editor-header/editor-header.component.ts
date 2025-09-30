@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { EditorApiService } from '../shared/api/editor-api.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { EditorFacade } from '../shared/facade/editor.facade';
+import { EditorFacade, SVG_ACTION } from '../shared/facade/editor.facade';
 
 @Component({
   selector: 'app-editor-header',
@@ -21,7 +21,7 @@ export class EditorHeaderComponent {
   }
 
   public onSave() {
-    this.editorFacade.trigSave()
+    this.editorFacade.trigAction(SVG_ACTION.SAVE)
   }
 
   public onFileSelected(event: Event) {
@@ -35,7 +35,7 @@ export class EditorHeaderComponent {
             'Successful Upload!',
             ''
           )
-        window.dispatchEvent(new Event('newUpload'))
+        this.editorFacade.trigAction(SVG_ACTION.UPLOAD)
       });
     }
   }
